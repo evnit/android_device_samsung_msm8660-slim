@@ -28,11 +28,12 @@ TARGET_BOARD_PLATFORM_GPU := qcom-adreno200
 TARGET_CPU_VARIANT := cortex-a8
 
 # Audio
-BOARD_HAVE_SAMSUNG_AUDIO := true
+BOARD_USES_ALSA_AUDIO := true
 BOARD_USES_LEGACY_ALSA_AUDIO := true
-BOARD_QCOM_TUNNEL_LPA_ENABLED := true
-BOARD_QCOM_VOIP_ENABLED := true
-TARGET_QCOM_AUDIO_VARIANT := caf
+TARGET_USES_QCOM_COMPRESSED_AUDIO := true
+QCOM_ADSP_SSR_ENABLED := false
+QCOM_ANC_HEADSET_ENABLED := false
+QCOM_FLUENCE_ENABLED := false
 
 # Bluetooth
 BOARD_HAVE_BLUETOOTH := true
@@ -45,22 +46,27 @@ BOARD_CAMERA_USE_MM_HEAP := true
 COMMON_GLOBAL_CFLAGS += -DQCOM_BSP_CAMERA_ABI_HACK
 COMMON_GLOBAL_CFLAGS += -DNEEDS_VECTORIMPL_SYMBOLS
 COMMON_GLOBAL_CFLAGS += -DSAMSUNG_CAMERA_HARDWARE
+TARGET_PROVIDES_CAMERA_HAL := true
+USE_DEVICE_SPECIFIC_CAMERA := true
 
 # Charger
 BOARD_BATTERY_DEVICE_NAME := "battery"
 BOARD_CHARGING_MODE_BOOTING_LPM := /sys/class/power_supply/battery/batt_lp_charging
 
+# CMHW
+BOARD_HARDWARE_CLASS += device/samsung/msm8660-common/cmhw
+
 # Display
 BOARD_EGL_CFG := device/samsung/msm8660-common/configs/egl.cfg
 NUM_FRAMEBUFFER_SURFACE_BUFFERS := 3
-TARGET_BOOTANIMATION_PRELOAD := true
 TARGET_DISPLAY_INSECURE_MM_HEAP := true
-TARGET_DISPLAY_USE_RETIRE_FENCE := true
 TARGET_NO_INITLOGO := true
-TARGET_QCOM_DISPLAY_VARIANT := caf
+TARGET_DISPLAY_USE_RETIRE_FENCE := true
 
-# GPS
-BOARD_HAVE_NEW_QC_GPS := true
+#TARGET_BOOTANIMATION_PRELOAD := true
+#BOARD_USES_LEGACY_MMAP := true
+#COMMON_GLOBAL_CFLAGS += -DNEW_ION_API
+#TARGET_NO_ADAPTIVE_PLAYBACK := true
 
 # External apps on SD
 TARGET_EXTERNAL_APPS = sdcard1
@@ -68,11 +74,17 @@ TARGET_EXTERNAL_APPS = sdcard1
 # Lights
 TARGET_PROVIDES_LIBLIGHT := true
 
+# GPS
+#BOARD_HAVE_NEW_QC_GPS := true
+
+# Logging
+#TARGET_USES_LOGD := false
+
 # Media
-TARGET_ENABLE_QC_AV_ENHANCEMENTS := true
-TARGET_QCOM_MEDIA_VARIANT := caf
+#TARGET_ENABLE_QC_AV_ENHANCEMENTS := true <last one disabled
 
 # Power
+#TARGET_POWERHAL_VARIANT := qcom
 TARGET_USES_CM_POWERHAL := true
 
 # Qualcomm support
@@ -87,36 +99,44 @@ TARGET_RECOVERY_FSTAB := device/samsung/msm8660-common/rootdir/etc/fstab.qcom
 TARGET_RELEASETOOLS_EXTENSIONS := device/samsung/msm8660-common
 
 # RIL
-BOARD_RIL_CLASS := ../../../device/samsung/msm8660-common/ril
+#BOARD_RIL_CLASS := ../../../device/samsung/msm8660-common/ril
 
 # SELinux
+
+include device/qcom/sepolicy/sepolicy.mk
+
 BOARD_SEPOLICY_DIRS += \
     device/samsung/msm8660-common/sepolicy
 
 BOARD_SEPOLICY_UNION += \
-    app.te \
     bluetooth.te \
+    bootanim.te \
     device.te \
-    domain.te \
-    drmserver.te \
-    file_contexts \
-    files \
     file.te \
-    hci_init.te \
-    healthd.te \
-    init.te \
+    file_contexts \
+    genfs_contexts \
     init_shell.te \
-    keystore.te \
-    kickstart.te \
+    kernel.te \
+    keypad_dev.te \
+    macloader.te \
     mediaserver.te \
+    mm-qcamerad.te \
+    mpdecision.te \
+    netmgrd.te \
+    orientationd.te \
+    platform_app.te \
+    qmuxd.te \
     rild.te \
+    rmt_storage.te \
     surfaceflinger.te \
-    system.te \
+    sysinit.te \
+    system_app.te \
+    system_server.te \
+    thermal-engine.te \
+    thermald.te \
     ueventd.te \
-    untrusted_app.te \
     vold.te \
-    wpa.te \
-    wpa_socket.te
+    wpa.te
 
 # Wifi related defines
 BOARD_HAVE_SAMSUNG_WIFI := true
@@ -140,3 +160,4 @@ WIFI_DRIVER_MODULE_AP_ARG   := "firmware_path=/system/etc/wifi/bcmdhd_apsta.bin 
 BOARD_VOLD_EMMC_SHARES_DEV_MAJOR := true
 BOARD_VOLD_MAX_PARTITIONS := 28
 TARGET_USE_CUSTOM_LUN_FILE_PATH := /sys/devices/platform/msm_hsusb/gadget/lun%d/file
+
